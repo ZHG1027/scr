@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>中文 · 数字 加密 / 解密</title>
+<style>
+:root{
+  --bg1:#f8fafd;
+  --bg2:#eef2fa;
+  --card:#ffffff;
+  --line:#e5e9f4;
+  --fg:#2a2f44;
+  --dim:#8a90a8;
+  --mute:#aeb4c8;
+  --blue:#4f74f5;
+  --blue-bg:#edf2ff;
+  --green:#17a97f;
+  --green-bg:#e8f8f2;
+  --radius:16px;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  padding:24px 16px 40px;
+  min-height:100vh;
+  font-family:"PingFang SC","Microsoft YaHei",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color:var(--fg);
+  background:
+    radial-gradient(760px 380px at 5% -10%, #e7edff 0%, rgba(231,237,255,0) 62%),
+    radial-gradient(720px 380px at 100% 2%, #e4f7f0 0%, rgba(228,247,240,0) 58%),
+    linear-gradient(180deg,var(--bg1) 0%, var(--bg2) 100%);
+  background-attachment:fixed;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1000px;margin:0 auto}
+
+/* ---------- 顶部 ---------- */
+.head{display:flex;align-items:center;gap:14px;margin:0 4px 18px}
+.logo{
+  width:46px;height:46px;flex:0 0 auto;border-radius:14px;
+  display:grid;place-items:center;font-size:22px;
+  background:#fff;border:1px solid var(--line);
+  box-shadow:0 6px 18px -10px rgba(79,116,245,.55);
+}
+h1{margin:0;font-size:19px;font-weight:600;letter-spacing:.3px}
+.sub{margin:3px 0 0;font-size:12.5px;color:var(--dim)}
+
+/* ---------- 密钥条 ---------- */
+.keybar{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  background:#fff;border:1px solid var(--line);border-radius:14px;
+  padding:10px 14px;margin-bottom:16px;
+  box-shadow:0 6px 22px -16px rgba(42,47,68,.45);
+}
+.keybar .lab{font-size:13px;color:var(--dim)}
+#key{
+  width:132px;padding:8px 12px;border-radius:10px;
+  border:1px solid var(--line);background:#f8faff;color:var(--fg);
+  font:600 16px/1 ui-monospace,Consolas,monospace;letter-spacing:5px;
+  outline:none;transition:.15s;
+}
+#key:focus{border-color:var(--blue);background:#fff;box-shadow:0 0 0 3px rgba(79,116,245,.12)}
+.mini{
+  padding:7px 12px;font-size:12.5px;border-radius:9px;cursor:pointer;
+  border:1px solid var(--line);background:#fff;color:var(--dim);
+  transition:.15s;font-family:inherit;
+}
+.mini:hover{color:var(--blue);border-color:#c9d6ff;background:#f7f9ff}
+
+/* ---------- 栏 ---------- */
+.sec{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:14px 16px 16px;margin-bottom:16px;
+  box-shadow:0 10px 30px -22px rgba(42,47,68,.5);
+}
+.sec.enc{border-top:3px solid #ccd9ff}
+.sec.dec{border-top:3px solid #c3ecdf}
+
+.sec-head{display:flex;align-items:center;gap:9px;margin-bottom:12px}
+.dot{width:8px;height:8px;border-radius:50%;flex:0 0 auto}
+.enc .dot{background:var(--blue);box-shadow:0 0 0 4px var(--blue-bg)}
+.dec .dot{background:var(--green);box-shadow:0 0 0 4px var(--green-bg)}
+.sec-head h2{margin:0;font-size:14.5px;font-weight:600;letter-spacing:.3px}
+.sec-head .hint{font-size:12px;color:var(--mute)}
+.act{
+  margin-left:auto;padding:8px 20px;border-radius:10px;border:none;
+  color:#fff;font-size:13.5px;font-family:inherit;cursor:pointer;
+  transition:.15s;letter-spacing:.5px;
+}
+.act.enc{background:linear-gradient(135deg,#6285ff,#4f74f5);box-shadow:0 8px 18px -10px rgba(79,116,245,.9)}
+.act.dec{background:linear-gradient(135deg,#25c095,#17a97f);box-shadow:0 8px 18px -10px rgba(23,169,127,.9)}
+.act:hover{filter:brightness(1.07);transform:translateY(-1px)}
+.act:active{transform:translateY(0)}
+
+.cols{display:flex;align-items:stretch;gap:10px}
+.col{flex:1 1 0;min-width:0;display:flex;flex-direction:column}
+.col .tag{
+  font-size:11.5px;color:var(--dim);margin-bottom:6px;letter-spacing:.6px;
+  display:flex;align-items:center;gap:6px;
+}
+.col .tag b{font-weight:500;color:var(--mute);font-size:11px}
+textarea{
+  width:100%;height:118px;resize:vertical;
+  padding:11px 12px;border-radius:11px;
+  border:1px solid var(--line);background:#fafbff;
+  color:var(--fg);font-size:14px;line-height:1.65;
+  font-family:inherit;outline:none;transition:.15s;
+}
+textarea:focus{border-color:var(--blue);background:#fff;box-shadow:0 0 0 3px rgba(79,116,245,.1)}
+.dec textarea:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(23,169,127,.1)}
+textarea[readonly]{background:#f6f8fd;color:#3a4460}
+
+.arrow{
+  align-self:center;margin-top:22px;flex:0 0 auto;
+  color:var(--mute);font-size:15px;user-select:none;
+}
+
+.bar{display:flex;gap:14px;align-items:center;margin-top:10px;flex-wrap:wrap}
+.link{
+  background:none;border:none;padding:4px 0;cursor:pointer;
+  font-size:12px;color:var(--dim);font-family:inherit;transition:.15s;
+}
+.link:hover{color:var(--blue);text-decoration:underline}
+.dec .link:hover{color:var(--green)}
+
+@media(max-width:640px){
+  .cols{flex-direction:column}
+  .arrow{display:none}
+  textarea{height:100px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="head">
+    <div class="logo">🔐</div>
+    <div>
+      <h1>中文 · 数字 加密 / 解密</h1>
+      <p class="sub">6 位数字密钥 · 符号与表情原样保留</p>
+    </div>
+  </div>
+
+  <div class="keybar">
+    <span class="lab">密钥</span>
+    <input id="key" type="text" inputmode="numeric" maxlength="6" value="482913">
+    <button class="mini" id="randKey">随机生成</button>
+  </div>
+
+  <!-- ===== 上：加密 ===== -->
+  <section class="sec enc">
+    <div class="sec-head">
+      <span class="dot"></span>
+      <h2>加密</h2>
+      <span class="hint">明文 → 密文</span>
+      <button class="act enc" id="btnEnc">加密</button>
+    </div>
+    <div class="cols">
+      <div class="col">
+        <div class="tag">明文 <b>中文 / 数字 / 符号 / 表情</b></div>
+        <textarea id="p1"></textarea>
+      </div>
+      <div class="arrow">➜</div>
+      <div class="col">
+        <div class="tag">密文</div>
+        <textarea id="c1" readonly></textarea>
+      </div>
+    </div>
+    <div class="bar">
+      <button class="link" id="copyC1">复制密文</button>
+      <button class="link" id="toDec">填入下方解密 ↓</button>
+    </div>
+  </section>
+
+  <!-- ===== 下：解密 ===== -->
+  <section class="sec dec">
+    <div class="sec-head">
+      <span class="dot"></span>
+      <h2>解密</h2>
+      <span class="hint">密文 → 明文</span>
+      <button class="act dec" id="btnDec">解密</button>
+    </div>
+    <div class="cols">
+      <div class="col">
+        <div class="tag">密文</div>
+        <textarea id="c2"></textarea>
+      </div>
+      <div class="arrow">➜</div>
+      <div class="col">
+        <div class="tag">明文</div>
+        <textarea id="p2" readonly></textarea>
+      </div>
+    </div>
+    <div class="bar">
+      <button class="link" id="copyP2">复制明文</button>
+      <button class="link" id="toEnc">填入上方加密 ↑</button>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* ========== 数论工具 ========== */
+const mod = (x, n) => ((x % n) + n) % n;
+
+function gcd(a, b) {
+  a = Math.abs(a); b = Math.abs(b);
+  while (b) { [a, b] = [b, a % b]; }
+  return a;
+}
+function egcd(a, b) {
+  if (b === 0) return [a, 1, 0];
+  const [g, x, y] = egcd(b, a % b);
+  return [g, y, x - Math.floor(a / b) * y];
+}
+function modInv(a, n) {
+  const [g, x] = egcd(mod(a, n), n);
+  if (g !== 1) throw new Error('模逆不存在');
+  return mod(x, n);
+}
+
+/* ========== 伪随机发生器 ========== */
+function splitmix32(state) {
+  state = (state + 0x9E3779B9) >>> 0;
+  let z = state;
+  z = Math.imul(z ^ (z >>> 16), 0x21F0AAAD) >>> 0;
+  z = Math.imul(z ^ (z >>> 15), 0x735A2D97) >>> 0;
+  z = (z ^ (z >>> 15)) >>> 0;
+  return [state, z];
+}
+
+/* ========== 密钥派生 ========== */
+const CJK_START = 0x4E00;
+const CJK_END   = 0x9FFF;
+const N_CJK     = CJK_END - CJK_START + 1;   // 20992 = 2^9 × 41
+
+function deriveKey(keyStr) {
+  const K = parseInt(keyStr, 10);
+
+  let st = (Math.imul(K, 0x9E3779B1) ^ 0xA5A5A5A5) >>> 0;
+  const rnd = () => { const r = splitmix32(st); st = r[0]; return r[1]; };
+  for (let i = 0; i < 8; i++) rnd();          // 预热
+
+  // 中文仿射乘数 a：必须与 20992 互质
+  let a = (rnd() % N_CJK) | 1;
+  let guard = 0;
+  while (gcd(a, N_CJK) !== 1 && guard++ < 1000) a = (a + 2) % N_CJK;
+  if (a === 0) a = 1;
+
+  const b  = rnd() % N_CJK;                    // 中文仿射偏移
+  const MULS = [1, 3, 7, 9];                   // 与 10 互质
+  const md = MULS[rnd() % 4];                  // 数字乘数
+  const dd = rnd() % 10;                       // 数字偏移
+  const saltC = rnd() >>> 0;                   // 中文位置流盐
+  const saltD = rnd() >>> 0;                   // 数字位置流盐
+  const mode = K % 3;                          // 变换族
+
+  return { K, a, b, md, dd, saltC, saltD, mode };
+}
+
+/* ========== 位置密钥流 ========== */
+function posStream(i, salt) {
+  let s = (Math.imul((i + 1) >>> 0, 0x9E3779B1) ^ salt) >>> 0;
+  s = Math.imul(s ^ (s >>> 16), 0x85EBCA6B) >>> 0;
+  s = Math.imul(s ^ (s >>> 13), 0xC2B2AE35) >>> 0;
+  s = (s ^ (s >>> 16)) >>> 0;
+  return s;
+}
+
+/* ========== 核心：加密 / 解密 ========== */
+function transform(text, keyStr, dir) {
+  const P     = deriveKey(keyStr);
+  const aInv  = modInv(P.a, N_CJK);   // 中文乘数模逆
+  const mdInv = modInv(P.md, 10);     // 数字乘数模逆
+
+  const chars = [...text];            // 按码点切分，表情不会被拆坏
+  let out = '';
+
+  for (let i = 0; i < chars.length; i++) {
+    const ch = chars[i];
+    const cp = ch.codePointAt(0);
+    const sc = posStream(i, P.saltC) % N_CJK;   // 中文位置流
+    const sd = posStream(i, P.saltD) % 10;      // 数字位置流
+
+    /* --- 阿拉伯数字 0-9 --- */
+    if (cp >= 0x30 && cp <= 0x39) {
+      const v = cp - 0x30;
+      let nv;
+      if (dir > 0) {
+        if (P.mode === 0)      nv = mod(P.md * v + P.dd + sd, 10);
+        else if (P.mode === 1) nv = mod(P.md * v + P.dd - sd, 10);
+        else                   nv = mod(P.md * (v + sd) + P.dd, 10);
+      } else {
+        if (P.mode === 0)      nv = mod(mdInv * (v - P.dd - sd), 10);
+        else if (P.mode === 1) nv = mod(mdInv * (v - P.dd + sd), 10);
+        else                   nv = mod(mdInv * (v - P.dd) - sd, 10);
+      }
+      out += String.fromCharCode(0x30 + nv);
+
+    /* --- 中日韩统一表意文字 U+4E00 ~ U+9FFF --- */
+    } else if (cp >= CJK_START && cp <= CJK_END) {
+      const v = cp - CJK_START;
+      let nv;
+      if (dir > 0) {
+        if (P.mode === 0)      nv = mod(P.a * v + P.b + sc, N_CJK);
+        else if (P.mode === 1) nv = mod(P.a * v + P.b - sc, N_CJK);
+        else                   nv = mod(P.a * (v + sc) + P.b, N_CJK);
+      } else {
+        if (P.mode === 0)      nv = mod(aInv * (v - P.b - sc), N_CJK);
+        else if (P.mode === 1) nv = mod(aInv * (v - P.b + sc), N_CJK);
+        else                   nv = mod(aInv * (v - P.b) - sc, N_CJK);
+      }
+      out += String.fromCodePoint(CJK_START + nv);
+
+    /* --- 其它（符号 / 空格 / 字母 / 表情）原样透传 --- */
+    } else {
+      out += ch;
+    }
+  }
+  return out;
+}
+
+/* ========== 页面交互 ========== */
+const $ = id => document.getElementById(id);
+
+function getKey() {
+  const k = $('key').value.trim();
+  if (!/^\d{6}$/.test(k)) {
+    alert('密钥必须是 6 位数字（000000 ~ 999999）');
+    $('key').focus();
+    return null;
+  }
+  return k;
+}
+
+$('btnEnc').onclick = () => {
+  const k = getKey(); if (!k) return;
+  $('c1').value = transform($('p1').value, k, 1);
+};
+
+$('btnDec').onclick = () => {
+  const k = getKey(); if (!k) return;
+  $('p2').value = transform($('c2').value, k, -1);
+};
+
+$('randKey').onclick = () => {
+  $('key').value = String(Math.floor(Math.random() * 1e6)).padStart(6, '0');
+};
+
+$('toDec').onclick = () => {
+  if (!$('c1').value) { alert('请先在上方完成加密'); return; }
+  $('c2').value = $('c1').value;
+  $('c2').focus();
+};
+
+$('toEnc').onclick = () => {
+  if (!$('p2').value) { alert('请先在下方完成解密'); return; }
+  $('p1').value = $('p2').value;
+  $('p1').focus();
+};
+
+async function copyText(el, btn) {
+  const t = el.value;
+  if (!t) return;
+  try {
+    await navigator.clipboard.writeText(t);
+    const old = btn.textContent;
+    btn.textContent = '已复制 ✓';
+    setTimeout(() => btn.textContent = old, 1200);
+  } catch (e) {
+    alert('复制失败，请手动选中复制');
+  }
+}
+$('copyC1').onclick = () => copyText($('c1'), $('copyC1'));
+$('copyP2').onclick = () => copyText($('p2'), $('copyP2'));
+
+// 密钥框只允许输入数字
+$('key').addEventListener('input', e => {
+  e.target.value = e.target.value.replace(/\D/g, '').slice(0, 6);
+});
+</script>
+</body>
+</html>
